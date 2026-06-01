@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="PWA privada para registrar tu peso, ver tendencias y consultar tu progreso sin conexión."
+    />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Mi Peso" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <title>Mi Peso · Seguimiento</title>
+
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="hero">
+        <nav class="topbar" aria-label="Información de la aplicación">
+          <span class="brand-mark" aria-hidden="true">⚖️</span>
+          <span class="brand-name">Mi Peso</span>
+          <span class="offline-pill">PWA offline</span>
+        </nav>
+
+        <div class="hero-copy">
+          <p class="eyebrow">Seguimiento personal</p>
+          <h1>Tu progreso, claro y a mano en iPhone.</h1>
+          <p>
+            Registra tu peso, define un objetivo y revisa la tendencia desde una app instalable,
+            rápida y privada: los datos se guardan en este dispositivo.
+          </p>
+        </div>
+      </header>
+
+      <main class="main-grid">
+        <section class="stats-grid" aria-label="Resumen de progreso">
+          <article class="stat-card stat-card--primary">
+            <span class="stat-label">Peso actual</span>
+            <strong id="currentWeight">—</strong>
+            <small id="currentDate">Añade tu primer registro</small>
+          </article>
+
+          <article class="stat-card">
+            <span class="stat-label">Cambio total</span>
+            <strong id="totalChange">—</strong>
+            <small id="totalLabel">Desde el primer registro</small>
+          </article>
+
+          <article class="stat-card">
+            <span class="stat-label">Tendencia</span>
+            <strong id="weeklyTrend">—</strong>
+            <small id="weeklyLabel">Últimos registros</small>
+          </article>
+
+          <article class="stat-card">
+            <span class="stat-label">Objetivo</span>
+            <strong id="goalDistance">—</strong>
+            <small id="goalLabel">Define una meta</small>
+          </article>
+        </section>
+
+        <section class="card entry-card" aria-labelledby="entryTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Registro</p>
+              <h2 id="entryTitle">Añadir peso</h2>
+            </div>
+            <button class="ghost-button" id="cancelEditButton" type="button" hidden>Cancelar edición</button>
+          </div>
+
+          <form id="entryForm" class="form-grid">
+            <label>
+              Fecha
+              <input id="dateInput" name="date" type="date" required />
+            </label>
+
+            <label>
+              Peso en kg
+              <input
+                id="weightInput"
+                name="weight"
+                type="number"
+                min="20"
+                max="350"
+                step="0.1"
+                inputmode="decimal"
+                placeholder="Ej. 82.4"
+                required
+              />
+            </label>
+
+            <label class="form-grid__wide">
+              Nota opcional
+              <textarea
+                id="noteInput"
+                name="note"
+                rows="3"
+                maxlength="140"
+                placeholder="Ej. después de entrenar, viaje, sensación..."
+              ></textarea>
+            </label>
+
+            <button id="saveEntryButton" class="primary-button form-grid__wide" type="submit">
+              Guardar registro
+            </button>
+          </form>
+        </section>
+
+        <section class="card goal-card" aria-labelledby="goalTitle">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Meta</p>
+              <h2 id="goalTitle">Objetivo de peso</h2>
+            </div>
+          </div>
+
+          <form id="goalForm" class="inline-form">
+            <label>
+              Peso objetivo
+              <input
+                id="goalInput"
+                name="goal"
+                type="number"
+                min="20"
+                max="350"
+                step="0.1"
+                inputmode="decimal"
+                placeholder="Ej. 78"
+              />
+            </label>
+            <button class="secondary-button" type="submit">Actualizar meta</button>
+          </form>
+          <p class="hint">Puedes dejar el objetivo vacío para ocultar la comparación.</p>
+        </section>
+
+        <section class="card chart-card" aria-labelledby="chartTitle">
+          <div class="section-heading section-heading--row">
+            <div>
+              <p class="eyebrow">Tendencia</p>
+              <h2 id="chartTitle">Evolución</h2>
+            </div>
+            <label class="range-select">
+              Rango
+              <select id="rangeSelect">
+                <option value="30">30 días</option>
+                <option value="90" selected>90 días</option>
+                <option value="all">Todo</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="chart-shell">
+            <svg id="weightChart" role="img" aria-label="Gráfica de evolución de peso" viewBox="0 0 640 280"></svg>
+            <p id="chartEmpty" class="empty-state">
+              Añade al menos dos registros para ver la línea de progreso.
+            </p>
+          </div>
+        </section>
+
+        <section class="card history-card" aria-labelledby="historyTitle">
+          <div class="section-heading section-heading--row">
+            <div>
+              <p class="eyebrow">Datos</p>
+              <h2 id="historyTitle">Historial</h2>
+            </div>
+            <div class="button-row">
+              <button id="exportCsvButton" class="ghost-button" type="button">CSV</button>
+              <button id="exportJsonButton" class="ghost-button" type="button">JSON</button>
+            </div>
+          </div>
+
+          <div class="import-row">
+            <label class="file-button">
+              Importar JSON
+              <input id="importInput" type="file" accept="application/json,.json" />
+            </label>
+            <button id="clearDataButton" class="danger-button" type="button">Borrar todo</button>
+          </div>
+
+          <div id="historyList" class="history-list" aria-live="polite"></div>
+        </section>
+
+        <section id="installHelp" class="card install-card" aria-labelledby="installTitle">
+          <div>
+            <p class="eyebrow">Instalar en iOS</p>
+            <h2 id="installTitle">Guárdala como app en tu iPhone</h2>
+            <ol>
+              <li>Abre la web en Safari.</li>
+              <li>Toca el botón compartir.</li>
+              <li>Elige “Añadir a pantalla de inicio”.</li>
+            </ol>
+          </div>
+          <button id="installButton" class="secondary-button" type="button" hidden>Instalar</button>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
