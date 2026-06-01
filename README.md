@@ -40,6 +40,17 @@ git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
 git push -u origin main
 ```
 
+## Publicar en GitHub Pages
+
+Este proyecto está preparado para GitHub Pages con una acción automática. Después de subirlo a GitHub:
+
+1. En el repositorio, ve a `Settings` → `Pages`.
+2. En `Build and deployment`, elige `Source: GitHub Actions`.
+3. Haz un `push` a `main`.
+4. GitHub ejecutará el workflow `Deploy to GitHub Pages` y publicará la carpeta `dist`.
+
+Si Pages sirve la rama directamente en vez de usar GitHub Actions, pueden fallar los estilos porque la app necesita el build de Vite.
+
 ## Desplegar en Vercel
 
 1. Entra en [Vercel](https://vercel.com/) e importa el repositorio de GitHub.

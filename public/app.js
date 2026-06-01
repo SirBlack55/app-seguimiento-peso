@@ -563,7 +563,7 @@ function registerServiceWorker() {
   }
 
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/service-worker.js").catch(() => {
+    navigator.serviceWorker.register("service-worker.js").catch(() => {
       showToast("La app funciona, pero el modo offline no se pudo activar.");
     });
   });

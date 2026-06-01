@@ -1,17 +1,22 @@
-const CACHE_NAME = "mi-peso-cache-v2";
+const CACHE_NAME = "mi-peso-cache-v3";
+const APP_ROOT = new URL("./", self.location.href);
 const APP_SHELL = [
-  "/",
-  "/index.html",
-  "/app.js",
-  "/styles.css",
-  "/manifest.webmanifest",
-  "/icons/icon.svg",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/maskable-512.png",
-  "/icons/apple-touch-icon.png",
-];
-const NETWORK_FIRST_PATHS = new Set(["/", "/index.html", "/app.js", "/styles.css", "/manifest.webmanifest"]);
+  "./",
+  "index.html",
+  "app.js",
+  "styles.css",
+  "manifest.webmanifest",
+  "icons/icon.svg",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/maskable-512.png",
+  "icons/apple-touch-icon.png",
+].map((path) => new URL(path, APP_ROOT).href);
+const NETWORK_FIRST_URLS = new Set(
+  ["./", "index.html", "app.js", "styles.css", "manifest.webmanifest"].map(
+    (path) => new URL(path, APP_ROOT).href,
+  ),
+);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -47,7 +52,7 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   const isSameOrigin = url.origin === self.location.origin;
 
-  if (request.mode === "navigate" || (isSameOrigin && NETWORK_FIRST_PATHS.has(url.pathname))) {
+  if (request.mode === "navigate" || (isSameOrigin && NETWORK_FIRST_URLS.has(url.href))) {
     event.respondWith(networkFirst(request));
     return;
   }
@@ -76,10 +81,14 @@ async function networkFirst(request) {
   try {
     const response = await fetch(request);
     if (response.ok) {
-      await cache.put(request.mode === "navigate" ? "/" : request, response.clone());
+      await cache.put(request.mode === "navigate" ? APP_ROOT.href : request, response.clone());
     }
     return response;
   } catch {
-    return (await caches.match(request)) || (await caches.match("/")) || (await caches.match("/index.html"));
+    return (
+      (await caches.match(request)) ||
+      (await caches.match(APP_ROOT.href)) ||
+      (await caches.match(new URL("index.html", APP_ROOT).href))
+    );
   }
 }
